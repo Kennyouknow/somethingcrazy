@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Valentine's Day</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Reset and Layout */
+        body {
+            font-family: 'Lora', serif;
+            margin: 0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-color: #000;
+            color: #fff;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        section {
+            padding: 60px 20px;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid rgba(255, 255, 255, 0.75);
+            animation: typing 4s steps(30, end), blink 0.5s step-end infinite alternate;
+        }
+
+        .hero h2 {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+            animation-delay: 4s;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Story Section */
+        .story-container {
+            max-width: 800px;
+            margin: 0 auto;
+            color: #f8f9fa;
+        }
+
+        .story p {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .story p.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Secret Letter Section */
+        .secret-letter-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            border: 2px dashed #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .secret-letter-box:hover {
+            transform: scale(1.05);
+        }
+
+        .letter-content {
+            display: none;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .letter-content.visible {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Background Music Button */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .music-control:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero h2 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas for Animated Background -->
+    <canvas id="shootingStarsCanvas"></canvas>
+
+    <!-- Background Music -->
+    <audio id="backgroundMusic" loop>
+        <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <button class="music-control" id="musicControl" title="Mute/Unmute">
+        🔊
+    </button>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Happy Valentine's Day</h1>
+        <h2>To the one who makes my heart bloom 🌌</h2>
+    </section>
+
+    <!-- Story Section -->
+    <section class="story">
+        <div class="container story-container" style="margin-bottom: 10%;">
+            <h2 class="text-center mb-4">A Little Story of Us</h2>
+            <p style="text-align: center;">Back then, we never knew that we would meet, let alone become like this. Just two people walking on their own paths, until somehow we ended up on the same track. Laughing together, chatting back and forth, until we finally felt like we've known each other for a long time. From there, everything started to change. And I never thought that the path we chose would take us this far. What was just an acquaintance is now the most important part of my life.</p>
+            
+        </div>
+    </section>
+
+    <!-- Secret Letter Section -->
+    <section class="secret">
+        <div class="container text-center">
+            <div class="secret-letter-box">
+                <strong style="size: 4rem;">Click to Open Your Secret Letter</strong>
+            </div>
+            <div class="letter-content">
+                
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Background Music Control
+        const music = document.getElementById('backgroundMusic');
+        const musicControl = document.getElementById('musicControl');
+        music.play();
+
+        musicControl.addEventListener('click', () => {
+            if (music.paused) {
+                music.play();
+                musicControl.textContent = '🔊';
+            } else {
+                music.pause();
+                musicControl.textContent = '🔇';
+            }
+        });
+
+        // Shooting Stars Animation
+        const canvas = document.getElementById('shootingStarsCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const stars = [];
+        const shootingStars = [];
+
+        // Create stars
+        for (let i = 0; i < 100; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5 + 0.5,
+                opacity: Math.random(),
+                speed: Math.random() * 0.5 + 0.1,
+            });
+        }
+
+        // Create shooting stars
+        function createShootingStar() {
+            shootingStars.push({
+                x: Math.random() * canvas.width,
+                y: 0,
+                length: Math.random() * 80 + 50,
+                speed: Math.random() * 4 + 2,
+                opacity: Math.random() * 0.8 + 0.2,
+                angle: Math.random() * Math.PI / 3 + Math.PI / 6,
+            });
+            setTimeout(createShootingStar, Math.random() * 3000 + 3000);
+        }
+        createShootingStar();
+
+        // Draw stars and shooting stars
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw static stars
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.fill();
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                }
+            });
+
+            // Draw shooting stars
+            shootingStars.forEach((shootingStar, index) => {
+                ctx.beginPath();
+                ctx.moveTo(shootingStar.x, shootingStar.y);
+                ctx.lineTo(
+                    shootingStar.x + shootingStar.length * Math.cos(shootingStar.angle),
+                    shootingStar.y + shootingStar.length * Math.sin(shootingStar.angle)
+                );
+                ctx.strokeStyle = `rgba(255, 255, 255, ${shootingStar.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                shootingStar.x += shootingStar.speed * Math.cos(shootingStar.angle);
+                shootingStar.y += shootingStar.speed * Math.sin(shootingStar.angle);
+
+                if (shootingStar.x > canvas.width || shootingStar.y > canvas.height) {
+                    shootingStars.splice(index, 1);
+                }
+            });
+
+            requestAnimationFrame(drawStars);
+        }
+        drawStars();
+
+        // Responsive Canvas Resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Story Section Animation
+        const storyParagraphs = document.querySelectorAll('.story p');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        });
+
+        storyParagraphs.forEach(paragraph => {
+            observer.observe(paragraph);
+        });
+
+        // Secret Letter Interactivity
+        const letterBox = document.querySelector('.secret-letter-box');
+        const letterContent = document.querySelector('.letter-content');
+
+        letterBox.addEventListener('click', () => {
+            letterBox.style.opacity = 0;
+            letterBox.style.transform = 'scale(0.5)';
+            setTimeout(() => {
+                letterBox.style.display = 'none';
+                letterContent.classList.add('visible');
+                typeLetterContent();
+            }, 300);
+        });
+
+        // Typing Effect for Letter Content
+        const letterText = [
+            "Behind the glittering stars of the night,",
+            "There is one light that never goes out",
+            "ITSS YOUUU!!.",
+            "Every second with you, is a second that I want to repeat.",
+            "I don't need a special day to love you, because for me, you are the specialness itself.",
+            "Thank you, Because you are always the reason I smile.",
+            "Today, tomorrow, and beyond I want to keep walking with you."
+        ];
+        let currentLine = 0;
+
+        function typeLetterContent() {
+            if (currentLine < letterText.length) {
+                const paragraph = document.createElement('p');
+                letterContent.appendChild(paragraph);
+
+                let charIndex = 0;
+                function typeLine() {
+                    if (charIndex < letterText[currentLine].length) {
+                        paragraph.textContent += letterText[currentLine][charIndex];
+                        charIndex++;
+                        setTimeout(typeLine, 100);
+                    } else {
+                        currentLine++;
+                        setTimeout(typeLetterContent, 500);
+                    }
+                }
+                typeLine();
+            }
+        }
+    </script>
+</body>
+</html>
